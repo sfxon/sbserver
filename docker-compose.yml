@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  sbserver:
+    image: dockware/shopware:latest
+    container_name: sbserver
+    ports:
+      - "22:22"
+      - "88:80"
+      - "443:443"
+      - "3335:3306"
+      - "5173:5173"      # Vite Dev Server
+      - "8080:8080"
+      - "8888:8888"
+      - "9998:9998"
+      - "9999:9999"
+    networks:
+      - web
+    environment:
+      - PHP_VERSION=8.4
+      - XDEBUG_ENABLED=1
+      - XDEBUG_REMOTE_HOST=172.17.0.1
+      - VIRTUAL_HOST="sbserver.local"
+      - VIRTUAL_PORT=88
+    volumes:
+      - "./:/var/www/html"
+      - "sbserver_db:/var/lib/mysql"
+  sbserver_db:
+    image: mariadb:latest
+    container_name: mysql_sbserver
+    networks:
+      - web
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=shopware
+      - MYSQL_PASSWORD=shopware
+      - MYSQL_DATABASE=shopware
+networks:
+  web:
+    external: false
+volumes:
+  sbserver_backend_cache:
+    driver: local
+  sbserver_db:
+    driver: local
